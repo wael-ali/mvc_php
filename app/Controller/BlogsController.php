@@ -4,7 +4,9 @@
 namespace app\Controller;
 
 
-class BlogsController
+use app\Core\Controller;
+
+class BlogsController extends Controller
 {
     private $name = 'home controller ...';
 

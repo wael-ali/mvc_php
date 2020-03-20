@@ -4,7 +4,9 @@
 namespace app\Controller;
 
 
-class HomeController
+use app\Core\Controller;
+
+class HomeController extends Controller
 {
     private $name = 'home controller ...';
 

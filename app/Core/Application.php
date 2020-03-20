@@ -24,13 +24,15 @@ class Application
     {
         $this->container = $container;
         $this->loadController();
-        $action = $this->currentRout->getAction();
         try{
-            $this->controller->$action();
+//            $this->controller->$action();
+            call_user_func_array([$this->controller, $this->currentRout->getAction()], $this->currentRout->getParams());
         }catch (\Error $e){
             echo '<pre>';
-            var_dump($e, '------------------------');
+            echo $e->getMessage();
             echo '</pre>';
+        }catch (\Exception $e){
+            echo $e->getMessage();
         }
     }
 
@@ -48,6 +50,8 @@ class Application
             }catch (NotFoundException $e){
                 $this->currentRout->updateRoutFromArray($this->notFoundRout);
                 $this->controller = $this->container->getController($this->currentRout->getController());
+            }catch (\Exception $e){
+                echo $e->getMessage();
             }
         }else{
             $this->currentRout = $this->container->getRoute();
