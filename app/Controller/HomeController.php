@@ -15,16 +15,21 @@ class HomeController extends Controller
      */
     public function index()
     {
-        echo __METHOD__.'<br>';
 
+//        $this->redirectTo('/about');
+        $this->render('home/index.phtml',[
+            'controller' => __CLASS__,
+            'colors' => ['green', 'blue', 'grey', 'red']
+        ]);
+        return;
     }
 
     /**
      * @Rout(rout:"/about",name:"about")
      */
-    public function aboutUs($Var,$lsl)
+    public function aboutUs()
     {
-        echo __METHOD__.'<br>';
+        $this->render('home/about.phtml');
     }
     public function __toString()
     {

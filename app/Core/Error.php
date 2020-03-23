@@ -4,30 +4,29 @@
 namespace app\Core;
 
 
-class Error
+class Error extends Controller
 {
 
     public function handle()
     {
         try{
-            if (APP_ENV == "DEV"){
-            $this->notFoundDEV();
-        }else{
-            $this->notFoundProd();
-        }
+            if (APP_ENV != "PROD"){
+                $this->notFoundDEV();
+            }else{
+                $this->notFoundProd();
+            }
         }catch (\Error $e){
 
         }
 
     }
 
-    public function notFoundProd()
+    private function notFoundProd()
     {
         echo '<h1>404 Not Found!!</h1>';
     }
-    public function notFoundDEV()
+    private function notFoundDEV()
     {
-        echo '<h1>404 Not Found!! DEV </h1><br> <h4>This Route is NOt Defined!!</h4>';
-
+        $this->render('errors/undefinedRoute.phtml');
     }
 }
