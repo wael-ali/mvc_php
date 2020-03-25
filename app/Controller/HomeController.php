@@ -16,7 +16,6 @@ class HomeController extends Controller
     public function index()
     {
 
-//        $this->redirectTo('/about');
         $this->render('home/index.phtml',[
             'controller' => __CLASS__,
             'colors' => ['green', 'blue', 'grey', 'red']
