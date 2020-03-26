@@ -1,7 +1,7 @@
 <?php
 
 
-namespace app\Core;
+namespace app\Service;
 
 
 class DbConnection
