@@ -74,7 +74,6 @@ class Container
             $routDefinitionFound = false;
             $actionDefinitionFound = false;
             $tempRout = [];
-
             $file = fopen($fileInfo->getRealPath(),"r");
             while(! feof($file))
             {
@@ -246,6 +245,7 @@ class Container
      */
     private function getInstanceFromReflection(\ReflectionClass $ref)
     {
+        $obj = null;
 //        var_dump('first line ---', $ref->getName(),$ref->isInterface());
         if (array_key_exists($ref->getName(), $this->services)){
             return $this->services[$ref->getName()];
@@ -256,15 +256,10 @@ class Container
         }
         if ($ref->getConstructor() == null) {
             $obj = $ref->newInstance();
-            $this->services[$ref->getName()] = $obj;
-            return $obj;
         } else if (($ref->getConstructor())->getNumberOfParameters() == 0) {
             $obj = $ref->newInstance();
-            $this->services[$ref->getName()] = $obj;
-            return $obj;
         // Service has  Dependencies in constructor.
         } else {
-            $obj = null;
             // Get Dependencies as reflections array
             $args = $this->getDependenciesAsReflections($ref);
             $argsInstances = [];
@@ -277,9 +272,9 @@ class Container
                 $argsInstances[] = $this::getInstanceFromReflection($argRef);
             }
             $obj = $ref->newInstanceArgs($argsInstances);
-            $this->services[$ref->getName()] = $obj;
-            return $obj;
         }
+        $this->services[$ref->getName()] = $obj;
+        return $obj;
     }
 
 }

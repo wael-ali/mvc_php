@@ -20,7 +20,9 @@ define('SERVICES_NAME_SPACE', '\app\Service\\');
 
 function dd(){
     $params = func_get_args();
+    echo '<pre>';
     var_dump($params);
+    echo '</pre>';
     die();
 }
 spl_autoload_register(function ($className){
@@ -29,20 +31,17 @@ spl_autoload_register(function ($className){
         require $path;
     }
 });
+// TODO PARSING CONFIGERATION FROM .env FILE TO GLOBAL VARIABLES
 
-$dbconfiguration = new DbConnection([
+$container = new Container(new DbConnection([
     'host' => 'localhost',
     'username' => 'root',
     'password' => 'root',
     'dbname' => 'mvc_1',
-]);
-$container = new Container($dbconfiguration);
+]));
 $app = new Application($container);
 
 
 
-
-echo '<pre>';
-//print_r($container->getRoutes());
-echo '</pre>';
+//dd($container)
 ?>
