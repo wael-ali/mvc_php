@@ -16,7 +16,7 @@ class Error extends Controller
                 $this->notFoundProd();
             }
         }catch (\Error $e){
-
+            dd('handle', $e);
         }
 
     }

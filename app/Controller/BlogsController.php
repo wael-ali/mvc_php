@@ -5,11 +5,25 @@ namespace app\Controller;
 
 
 use app\Core\Controller;
+use app\Service\MailingService;
 
-class BlogsController extends Controller
+class BlogsController extends Controller implements AppInterface
 {
     private $name = 'home controller ...';
+    /**
+     * @var MailingService
+     */
+    private $mailingService;
+//    /**
+//     * @var AppInterface
+//     */
+//    private $appInterface;
 
+    public function __construct(MailingService $mailingService)
+    {
+        $this->mailingService = $mailingService;
+//        $this->appInterface = $appInterface;
+    }
 
     /**
      * @Rout(rout:"/blogs/update",name:"update_blog")
@@ -38,5 +52,15 @@ class BlogsController extends Controller
     public function __toString()
     {
         return 'home controller';
+    }
+
+    public function getControllerName()
+    {
+        // TODO: Implement getControllerName() method.
+    }
+
+    public function getAppName()
+    {
+        // TODO: Implement getAppName() method.
     }
 }
