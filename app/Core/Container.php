@@ -55,23 +55,27 @@ class Container
         return $this->notFoundException;
     }
 
-    private function createControllers(){
-        $mainDir = CONTROLLER;
-        $dirs = [];
+    private function createControllers($mainDir = CONTROLLER){
         echo '<pre>';
         foreach (new \DirectoryIterator($mainDir) as $fileInfo) {
             if($fileInfo->isDot()) continue;
             if ($fileInfo->isDir()){
-                $dirs[$fileInfo->getFilename()] = $fileInfo->getPath();
+                $this->createControllers($fileInfo->getPathname());
                 continue;
             }
             // creating controller
-            $controllerName = (explode('.',$fileInfo->getFilename()))[0];
-            $controllerClass = CONTROLLERS_NAME_SPACE.$controllerName;
-            $reflector = new \ReflectionClass($controllerClass);
+            $controllerName = (explode('app',$fileInfo->getPathname()))[1];
+            $controllerName = 'app'.$controllerName;
+            $controllerClass = (explode('.',$controllerName));
+            $className = $controllerClass[0];
+
+            try{
+                $reflector = new \ReflectionClass($className);
+            }catch (\Exception $e){
+                dd($controllerName, $controllerClass, $e->getMessage());
+            }
             $cont  = $this->getInstanceFromReflection($reflector);
             $this->controllers[$controllerName] = $cont;
-
             // Create routes from comments in controller
             $routDefinitionFound = false;
             $actionDefinitionFound = false;

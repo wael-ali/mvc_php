@@ -29,6 +29,9 @@ spl_autoload_register(function ($className){
     $path = __DIR__.DS.str_replace('\\', DS,$className).'.php';
     if (file_exists($path)){
         require $path;
+    }else{
+        dd('spl_autoload_register',$className, 'path: ',$path);
+
     }
 });
 // TODO PARSING CONFIGERATION FROM .env FILE TO GLOBAL VARIABLES
