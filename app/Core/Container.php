@@ -68,7 +68,9 @@ class Container
             // creating controller
             $controllerName = (explode('.',$fileInfo->getFilename()))[0];
             $controllerClass = CONTROLLERS_NAME_SPACE.$controllerName;
-            $this->controllers[$controllerName] = new $controllerClass();
+            $reflector = new \ReflectionClass($controllerClass);
+            $cont  = $this->getInstanceFromReflection($reflector);
+            $this->controllers[$controllerName] = $cont;
 
             // Create routes from comments in controller
             $routDefinitionFound = false;
@@ -144,7 +146,6 @@ class Container
     }
     private function addToReflections($serviceObj, $className)
     {
-//        $serviceName = str_replace('\\','.',$className);
         if (!array_key_exists($className, $this->reflections)){
             $this->reflections[$className] = new \ReflectionClass($className);
         }
@@ -165,9 +166,23 @@ class Container
                     if ($param->isOptional()){
                         $args[] = $param->getDefaultValue();
                     }else{
-                        throw new \Exception($param->getName()
-                            .' is not optional, '.$ref->getName()
-                            .' can not be instantiated.--- cannt be autowired'
+                        // TODO fetch the argument from services.yaml
+                        try{
+                            $yam_args = $this->fetchServiceArgumentsFromServiceYaml($ref->getName());
+                        }catch (\Exception $e){
+                            // TODO make its own Exception
+                            throw $e;
+                        }
+                        if (isset($yam_args[$param->getName()])){
+                            $args[] = $yam_args[$param->getName()];
+                            continue;
+                        }
+                        throw new \Exception(
+                            'This service: '
+                            .$ref->getName()
+                            .' can not be instantiated.--- cannt be autowired, define it in serviecs.yaml and add the argument $'
+                            .$param->getName()
+                            .' and its value to be autowired'
                         );
                     }
                 }else{
@@ -177,9 +192,20 @@ class Container
                             try{
                                 $args[] = $param->getDefaultValue();
                             }catch (\Exception $e){
-                                dd($e->getMessage());
+                                throw $e;
                             }
                         }else{
+                            // TODO fetch the argument from services.yaml
+                            try{
+                                $yam_args = $this->fetchServiceArgumentsFromServiceYaml($ref->getName());
+                            }catch (\Exception $e){
+                                dd($e);
+                            }
+                            if (isset($yam_args[$param->getName()])){
+                                $args[] = $yam_args[$param->getName()];
+                                continue;
+                            }
+                            // if not in the services.yaml
                             throw new \Exception($param->getName()
                                 .' is not optional, '.$ref->getName()
                                 .' can not be instantiated.--- cannt be autowired'
@@ -246,12 +272,17 @@ class Container
     private function getInstanceFromReflection(\ReflectionClass $ref)
     {
         $obj = null;
-//        var_dump('first line ---', $ref->getName(),$ref->isInterface());
         if (array_key_exists($ref->getName(), $this->services)){
             return $this->services[$ref->getName()];
         }
         // TODO AUTOWIRE INTERFACES
         if ($ref->isInterface()){
+            /** @var \ReflectionClass $reflection */
+            foreach ($this->reflections as $reflection){
+                if ($reflection->implementsInterface($ref->getName())){
+                    return $this->getInstanceFromReflection($reflection);
+                }
+            }
             return null;
         }
         if ($ref->getConstructor() == null) {
@@ -276,5 +307,42 @@ class Container
         $this->services[$ref->getName()] = $obj;
         return $obj;
     }
+    // $serviceName is the class name
+    private function fetchServiceArgumentsFromServiceYaml(string $serviceName)
+    {
+        $throwException = false;
+        $exceptionMsg = 'none';
+        $filePath = ROOT.'config'.DS.'services.yaml';
+
+        if(!file_exists($filePath)){
+            $throwException = true;
+            $exceptionMsg = 'Services.yaml not Found';
+        }
+
+        $servicesYamlArray = \yaml_parse_file($filePath);
+        if (!$throwException && !isset($servicesYamlArray['services'])){
+            $throwException = true;
+            $exceptionMsg = 'services.yaml Does not have services entry or No entries under services.';
+        }
+        $servicesYamlArray = $servicesYamlArray['services'];
+        if ( !$throwException && !isset($servicesYamlArray[$serviceName])){
+            $throwException = true;
+            $exceptionMsg = $serviceName. ': is not defined in serviecs.yaml, or No entries under the service name';
+        }
+
+        if ( !$throwException && !isset($servicesYamlArray[$serviceName]['arguments'])){
+            $throwException = true;
+            $exceptionMsg = $serviceName. ': has no arguments entry in yaml, or NO entries under arguments';
+        }
+
+        if ($throwException){
+            throw new \Exception($exceptionMsg);
+        }
+
+        $arguments = $servicesYamlArray[$serviceName]['arguments'];
+
+        return  $arguments;
+    }
+
 
 }

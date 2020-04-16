@@ -1,0 +1,5 @@
+services:
+    app\Service\MailingService:
+        arguments:
+            from: 'wael.ali@elbformat.de'
+            to: 'some.value@example.com'
