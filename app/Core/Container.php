@@ -19,13 +19,10 @@ class Container
      */
     private $dbConnection;
 
-    public function __construct(DbConnection $dbConnection)
+    public function __construct()
     {
-        $this->addToReflections($dbConnection, DbConnection::class);
-        $this->addToServices($dbConnection, DbConnection::class);
         $this->createServices();
         $this->createControllers();
-        $this->dbConnection = $dbConnection;
     }
 
     public function getController($controllerName)
@@ -140,19 +137,6 @@ class Container
         $tempRout['action'] = trim($actarr[0]);
         $tempRout['params'] = (explode(')',trim($actarr[1])))[0];
         return $tempRout;
-    }
-    private function addToServices($serviceObj, $className)
-    {
-        $serviceName = str_replace('\\','.',$className);
-        if (!array_key_exists($className, $this->services)){
-            $this->services[$className] = $serviceObj;
-        }
-    }
-    private function addToReflections($serviceObj, $className)
-    {
-        if (!array_key_exists($className, $this->reflections)){
-            $this->reflections[$className] = new \ReflectionClass($className);
-        }
     }
 
     private function getDependenciesAsReflections(\ReflectionClass $ref)

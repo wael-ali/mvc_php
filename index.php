@@ -1,26 +1,28 @@
 <?php
 use app\Core\Container;
 use app\Core\Application;
-use app\Service\DbConnection;
 
 define('DS',DIRECTORY_SEPARATOR);
 define('APP_ENV','DEV');
 //define('APP_ENV','PROD');
-define('ROOT', __DIR__ . DS);
-define('APP', ROOT.'app'.DS);
-define('CONFIG', ROOT.'config'.DS);
-define('VIEW', APP.'View'.DS);
+define('ROOT',  __DIR__ . DS);
+define('APP',   ROOT.'app'.DS);
+define('CONFIG',ROOT.'config'.DS);
+define('VIEW',  APP.'View'.DS);
 define('MODEL', APP.'Model'.DS);
-define('DATA', APP.'Data'.DS);
-define('CORE', APP.'Core'.DS);
-define('SERVICES', APP.'Service'.DS);
+define('DATA',  APP.'Data'.DS);
+define('CORE',  APP.'Core'.DS);
+define('SERVICES',   APP.'Service'.DS);
 define('CONTROLLER', APP.'Controller'.DS);
-define('DOT_ENV', ROOT.'.env');
+define('DOT_ENV',    ROOT.'.env');
 define('CONTROLLERS_NAME_SPACE', '\app\Controller\\');
 define('SERVICES_NAME_SPACE', '\app\Service\\');
 
+// PARSING CONFIGERATION FROM .env FILE TO GLOBAL VARIABLES
 function parseDoteEnv(){
     if (file_exists(DOT_ENV)){
+        // default application environment.
+        $GLOBALS['APP_ENV'] = 'PROD';
         $envArray = [];
         $fileLines = file(DOT_ENV);
         foreach ($fileLines as $fileLine){
@@ -45,10 +47,25 @@ function parseDoteEnv(){
 }
 
 function dd(){
-    $params = func_get_args();
-    echo '<pre>';
-    var_dump($params);
-    echo '</pre>';
+    $trace = debug_backtrace(2, true);
+    echo '<div style="background-color: #262525; color: green; padding: 10px; font-size: larger">'
+            .$trace[0]["file"]
+            .':'
+            .$trace[0]["line"]
+            .'</div>'
+    ;
+    $args = func_get_args();
+    foreach ($args as $arg){
+        echo '<pre style="background-color: #262525; color: #9e7713; padding: 10px; font-size: larger">';
+//        if (is_object($arg)){
+//            $obj_vars = get_class_vars($arg);
+//            foreach ($obj_vars as $var => $value){
+//                echo '<li>'.$var .'=>'.$value.'</li>';
+//            }
+//        }
+         var_dump($arg);
+        echo '</pre>';
+    }
     die();
 }
 spl_autoload_register(function ($className){
@@ -60,16 +77,24 @@ spl_autoload_register(function ($className){
 
     }
 });
-// TODO PARSING CONFIGERATION FROM .env FILE TO GLOBAL VARIABLES
-parseDoteEnv(ROOT.'.env');
 
-$container = new Container(new DbConnection([
-    'host' => 'localhost',
-    'username' => 'root',
-    'password' => 'root',
-    'dbname' => 'mvc_1',
-]));
-$app = new Application($container);
+try{
+
+    parseDoteEnv();
+    $container = new Container();
+    $app = new Application($container);
+}catch (Exception $e){
+    if (!isset($GLOBALS['APP_ENV'])){
+        echo '<h1> Sorrey, Something went wrong</h1>';
+        return;
+    }
+    if (($GLOBALS['APP_ENV'] != 'PROD')){
+        throw $e;
+    }
+
+    echo '<h1> Sorrey, Something went wrong</h1>';
+//    dd('some exception', $e->getMessage());
+}
 
 
 

@@ -25,7 +25,6 @@ class Application
         $this->container = $container;
         $this->loadController();
         try{
-//            $this->controller->$action();
             call_user_func_array([$this->controller, $this->currentRout->getAction()], $this->currentRout->getParams());
         }catch (\Error $e){
             echo '<pre>';
@@ -37,6 +36,7 @@ class Application
     }
 
     protected function loadController(){
+
         $requestUri = $_SERVER['REQUEST_URI'];
         foreach ($this->container->getRoutes() as $route){
             if ($requestUri == $route->getRout()){
@@ -54,8 +54,9 @@ class Application
                 echo $e->getMessage();
             }
         }else{
-            $this->currentRout = $this->container->getRoute();
+            $this->currentRout = $this->container->getRoute();// default route is the notfound route
             $this->controller = $this->container->getController($this->currentRout->getController());
         }
+        dd($this->currentRout);
     }
 }
