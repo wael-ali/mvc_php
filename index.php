@@ -18,6 +18,63 @@ define('DOT_ENV',    ROOT.'.env');
 define('CONTROLLERS_NAME_SPACE', '\app\Controller\\');
 define('SERVICES_NAME_SPACE', '\app\Service\\');
 
+
+function obj2array ( &$Instance ) {
+    $clone = (array) $Instance;
+    $className = get_class($Instance);
+    $arr = [];
+    $arr['class_name'] = $className;
+
+    foreach ($clone as $key => $value){
+        $aux = explode($className,$key);
+        $arr['class_vars'][$aux[1]] = $value;
+    }
+    return $arr;
+}
+
+function dump_obj($obj){
+    $obj_arr = obj2array($obj);
+    $id  = 'class:'.$obj_arr['class_name'];
+    echo '<div class="has-div-container-js" onclick="toggleFirstChild()">'.$obj_arr['class_name'];
+        echo '<div  style="display:block; padding-lift: 40px">';
+            foreach ($obj_arr['class_vars'] as $key => $value){
+                echo '<div>';
+                    echo $key.' : ';
+                    if (is_array($value)){
+                        dump_array($value);
+                    }else if (is_object($value)){
+                        dump_obj($value);
+                    }else{
+                        echo $value;
+                    }
+                echo '<div />';
+            }
+        echo '</div>';
+    echo '</div>';
+}
+function dump_array($array){
+    echo '<div class="has-div-container-js" onclick="toggleFirstChild()"> array: ';
+        echo '<div style="display: block">';
+            if (count($array) === 0){
+                echo '<div> array : []</div>';
+            }
+            foreach ($array as $key => $value){
+                echo '<div>';
+                    echo $key.' : ';
+                    if (is_array($value)){
+                        dump_array($value);
+                    }else if(is_object($value)){
+                        dump_obj($value);
+                    }else{
+                        echo $value;
+                    }
+                echo '</div>';
+            }
+        echo '</div>'
+    .'</div>';
+}
+
+
 // PARSING CONFIGERATION FROM .env FILE TO GLOBAL VARIABLES
 function parseDoteEnv(){
     if (file_exists(DOT_ENV)){
@@ -52,20 +109,37 @@ function dd(){
             .$trace[0]["file"]
             .':'
             .$trace[0]["line"]
-            .'</div>'
+        .'</div>'
     ;
     $args = func_get_args();
+
     foreach ($args as $arg){
         echo '<pre style="background-color: #262525; color: #9e7713; padding: 10px; font-size: larger">';
-//        if (is_object($arg)){
-//            $obj_vars = get_class_vars($arg);
-//            foreach ($obj_vars as $var => $value){
-//                echo '<li>'.$var .'=>'.$value.'</li>';
-//            }
-//        }
-         var_dump($arg);
+            if (is_object($arg)){
+                dump_obj($arg);
+            }else if (is_array($arg)){
+                dump_array($arg);
+            }else{
+                echo '<div onclick="toggleFirstChild()">';
+                    echo '<div >';
+                        var_dump($arg);
+                    echo '</div>'.
+                '</div>';
+            }
         echo '</pre>';
     }
+
+    echo '<script>
+        function toggleFirstChild() {
+            var clicked = event.target;
+            console.log(clicked);
+            if (clicked.classList.contains("has-div-container-js")){
+                var toggledDiv = event.target.firstElementChild;
+                console.log(clicked);
+                toggledDiv.style.display = window.getComputedStyle(toggledDiv).display === "none" ? "block" : "none";  
+            } 
+        }
+    </script>';
     die();
 }
 spl_autoload_register(function ($className){

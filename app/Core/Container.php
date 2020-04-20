@@ -53,7 +53,6 @@ class Container
     }
 
     private function createControllers($mainDir = CONTROLLER){
-        echo '<pre>';
         foreach (new \DirectoryIterator($mainDir) as $fileInfo) {
             if($fileInfo->isDot()) continue;
             if ($fileInfo->isDir()){
@@ -99,7 +98,6 @@ class Container
             }
             fclose($file);
         }
-        echo '</pre>';
 
         $this->controllers['Error'] = new Error();
     }
@@ -223,7 +221,6 @@ class Container
     {
         $mainDir = SERVICES;
         $dirs = [];
-        echo '<pre>';
         foreach (new \DirectoryIterator($mainDir) as $fileInfo) {
             if ($fileInfo->isDot()) continue;
             if ($fileInfo->isDir()) {
