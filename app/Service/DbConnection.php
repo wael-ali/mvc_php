@@ -19,7 +19,7 @@ class DbConnection
     private $password = null;
     private $dbname = null;
     private $database = null;
-    private $dbConnection = null;
+    private $mysqli = null;
 
     public function __construct()
     {
@@ -135,15 +135,27 @@ class DbConnection
     }
 
     /**
-     * @return null
+     * @return \mysqli
      */
-    public function getDbConnection()
+    public function getMysqli(): \mysqli
     {
-        return $this->dbConnection;
+        return $this->mysqli;
+    }
+    /**
+     * @return \mysqli
+     */
+    public function getEmptyMysqli(): \mysqli
+    {
+        $mysqli = new \mysqli(
+            $this->getHost(),
+            $this->getUsername(),
+            $this->getPassword()
+        );
+        return $mysqli;
     }
 
     /**
-     * @param null $dbConnection
+     * @param null $mysqli
      */
     private function generateDbConnection()
     {
@@ -154,12 +166,12 @@ class DbConnection
                 $this->getPassword(),
                 $this->getDbname()
             );
-
-            if ($mysqli -> connect_errno) {
-                echo "Failed to connect to MySQL: " . $mysqli -> connect_error;
-                exit();
+//            dd($mysqli->connect_errno);
+            if ($mysqli->connect_errno) {
+                $msg =  "Failed to connect to MySQL: " . $mysqli -> connect_error;
+                throw new \Exception($msg);
             }
-            $this->dbConnection = $mysqli;
+            $this->mysqli = $mysqli;
             return 1;
         }
         throw new \Exception($this->database.' databases till now not supported, please use mysql database.');
@@ -180,6 +192,5 @@ class DbConnection
     {
         $this->database = $database;
     }
-
 
 }

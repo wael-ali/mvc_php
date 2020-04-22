@@ -9,6 +9,6 @@ class DashBordController
      */
     public function test()
     {
-        echo 'DashBordController--';
+        echo 'DashBordController::test';
     }
 }
