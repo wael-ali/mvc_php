@@ -2,6 +2,8 @@
 
 <?php
 
+include_once 'kern.php';
+
 use app\Core\Container;
 
 class Console
@@ -138,8 +140,8 @@ class Console
     }
 
 }
-include_once './app/Core/Container.php';
-$console = new Console(new Container());
+//include_once './app/Core/Container.php';
+$console = new Console($container);
 $console->handleInput($argc, $argv);
 
 

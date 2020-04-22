@@ -1,34 +1,10 @@
 <?php
-use app\Core\Container;
+include_once 'kern.php';
 use app\Core\Application;
-use app\Core\Dump;
-use app\Core\Initiate;
 
-define('DS',DIRECTORY_SEPARATOR);
-define('ROOT',  __DIR__ . DS);
 
-spl_autoload_register(function ($className){
-    $path = __DIR__.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR,$className).'.php';
-    if (file_exists($path)){
-        require $path;
-    }else{
-        var_dump('spl_autoload_register',$className, 'path: ',$path);die();
-
-    }
-});
-
-$init = new Initiate();
-$init->initiateEnv();
-
-function dd(){
-    $args = func_get_args();
-//    var_dump(is_array($args), is_array($args)); die();
-    $dump = new Dump();
-    $dump->dd($args);
-}
 
 try{
-    $container = new Container();
     $app = new Application($container);
 }catch (Exception $e){
     if (!isset($GLOBALS['APP_ENV'])){
