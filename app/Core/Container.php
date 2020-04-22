@@ -152,7 +152,7 @@ class Container
                     if ($param->isOptional()){
                         $args[] = $param->getDefaultValue();
                     }else{
-                        // TODO fetch the argument from services.yaml
+                        // fetch the argument from services.yaml
                         try{
                             $yam_args = $this->fetchServiceArgumentsFromServiceYaml($ref->getName());
                         }catch (\Exception $e){
@@ -181,7 +181,7 @@ class Container
                                 throw $e;
                             }
                         }else{
-                            // TODO fetch the argument from services.yaml
+                            // fetch the argument from services.yaml
                             try{
                                 $yam_args = $this->fetchServiceArgumentsFromServiceYaml($ref->getName());
                             }catch (\Exception $e){
@@ -268,6 +268,10 @@ class Container
                     return $this->getInstanceFromReflection($reflection);
                 }
             }
+            return null;
+        }
+        // TODO handle traits
+        if ($ref->isTrait()){
             return null;
         }
         if ($ref->getConstructor() == null) {

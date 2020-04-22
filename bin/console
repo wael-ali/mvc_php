@@ -1,0 +1,148 @@
+#!/usr/bin/env php
+
+<?php
+
+use app\Core\Container;
+
+class Console
+{
+    const  COMMANDS =[
+        "make:controller",
+        "make:eintity",
+        "make:database",
+        "mvc:database:create",
+    ];
+
+    const FONT_COLORES = [
+            "Black"     =>	"0;30",
+            "Dark Grey" =>	"1;30",
+            "Red"       =>	"0;31",
+            "Light Red" =>	"1;31",
+            "Green"     =>	"0;32",
+            "Light Green" =>	"1;32",
+            "Brown"     =>	"0;33",
+            "Yellow"    =>	"1;33",
+            "Blue"      =>	"0;34",
+            "Light Blue" =>	"1;34",
+            "Magenta"    =>	"0;35",
+            "Light Magenta" =>	"1;35",
+            "Cyan"       =>	"0;36",
+            "Light Cyan" =>	"1;36",
+            "Light Grey" =>	"0;37",
+            "White"      =>	"1;37",
+        ];
+
+    const BG_COLORES = [
+            "Black"	=> "40",
+            "Red"	=> "41",
+            "Green"	=> "42",
+            "Yellow"	=> "43",
+            "Blue"	=> "44",
+            "Magenta"	=> "45",
+            "Cyan"	=> "46",
+            "Light Grey"	=> "47",
+        ];
+
+    const TYPES = [
+        'info' => [
+            'font_color' => self::FONT_COLORES['Light Blue'],
+            'bg_color' => self::BG_COLORES['Black'],
+        ],
+        'error' => [
+            'font_color' => self::FONT_COLORES['White'],
+            'bg_color' => self::BG_COLORES['Red'],
+        ],
+        'success' => [
+            'font_color' => self::FONT_COLORES['Yellow'],
+            'bg_color' => self::BG_COLORES['Cyan'],
+        ],
+        'warning' => [
+            'font_color' => self::FONT_COLORES['Yellow'],
+            'bg_color' => self::BG_COLORES['Black'],
+        ],
+    ];
+    /**
+     * @var Container
+     */
+    private $container;
+
+    public function __construct(Container $container)
+    {
+        $this->container = $container;
+    }
+
+
+    public function handleInput($argc, $argv){
+
+      $this->colorize('handling input command from cmd', 'info');
+        if ($argc === 1){
+            $this->logInfo();
+        }else{
+            // command name
+            $command = $argv[1];
+            if (!in_array($command, self::COMMANDS)){
+              $this->logInfo();
+              return;
+            }
+            // check if command name registerd in app
+            $this->colorize('checking if command is registerd.', 'info');
+            // run the command
+            $this->colorize('command is running', 'info');
+        }
+
+    }
+
+
+
+    private function colorize($text, $type){
+        $esc = "\033";
+        $brackt = "[";
+        $semi = ";";
+        $m = "m";
+
+        $newline = "\n";
+        $closeColoring = "[0m";
+        $endTag = $esc.$closeColoring;
+
+        switch ($type){
+            case 'info':
+              echo $esc.$brackt.self::TYPES['info']['font_color'].$semi.self::TYPES['info']['bg_color'].$m
+                  .$text
+                  .$esc.$closeColoring.$newline;
+              break;
+            case 'error':
+              echo $esc.$brackt.self::TYPES['error']['font_color'].$semi.self::TYPES['error']['bg_color'].$m
+                  .$text
+                  .$esc.$closeColoring.$newline;
+              break;
+            case 'success':
+              echo $esc.$brackt.self::TYPES['success']['font_color'].$semi.self::TYPES['success']['bg_color'].$m
+                  .$text
+                  .$esc.$closeColoring.$newline;
+              break;
+            case 'warning':
+              echo $esc.$brackt.self::TYPES['warning']['font_color'].$semi.self::TYPES['warning']['bg_color'].$m
+                  .$text
+                  .$esc.$closeColoring.$newline;
+              break;
+
+        }
+    }
+
+    private function logInfo(){
+
+        $this->colorize('Did you mean: ', 'error');
+        foreach (self::COMMANDS as $command){
+            $this->colorize($command, 'info');
+        }
+    }
+
+}
+include_once './app/Core/Container.php';
+$console = new Console(new Container());
+$console->handleInput($argc, $argv);
+
+
+
+
+

@@ -10,7 +10,7 @@ class Error extends Controller
     public function handle()
     {
         try{
-            if (APP_ENV != "PROD"){
+            if ($GLOBALS['APP_ENV'] != "PROD"){
                 $this->notFoundDEV();
             }else{
                 $this->notFoundProd();
