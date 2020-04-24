@@ -141,18 +141,6 @@ class DbConnection
     {
         return $this->mysqli;
     }
-    /**
-     * @return \mysqli
-     */
-    public function getEmptyMysqli(): \mysqli
-    {
-        $mysqli = new \mysqli(
-            $this->getHost(),
-            $this->getUsername(),
-            $this->getPassword()
-        );
-        return $mysqli;
-    }
 
     /**
      * @param null $mysqli
@@ -163,14 +151,10 @@ class DbConnection
             $mysqli = new \mysqli(
                 $this->getHost(),
                 $this->getUsername(),
-                $this->getPassword(),
-                $this->getDbname()
+                $this->getPassword()//,
+//                $this->getDbname()
             );
-//            dd($mysqli->connect_errno);
-            if ($mysqli->connect_errno) {
-                $msg =  "Failed to connect to MySQL: " . $mysqli -> connect_error;
-                throw new \Exception($msg);
-            }
+
             $this->mysqli = $mysqli;
             return 1;
         }

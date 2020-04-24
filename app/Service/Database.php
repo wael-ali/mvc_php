@@ -38,30 +38,57 @@ class Database
     public function getDBtables(){
         /** @var \mysqli $mysqli */
         $mysqli =  $this->getDbConnection()->getMysqli();
+        if ($mysqli->connect_errno) {
+            $msg =  "Failed to connect to MySQL: " . $mysqli -> connect_error;
+            throw new \Exception($msg);
+        }
         $query = $mysqli->host_info;
         dd('getDBtables',$query);
     }
+
+    /**
+     * @param array $tableConfigs
+     * @throws \Exception
+     *
+     */
     public function createTable(array $tableConfigs){
         /** @var \mysqli $mysqli */
         $mysqli =  $this->getDbConnection()->getMysqli();
-        $tableName = 'tests';
+        $this->checkDbConnection($mysqli);
         $createTable  = $this->getSql(self::CREATE_TABLE, $tableConfigs);
         $query = $mysqli->query($createTable);
         if (!$query){
             throw new \Exception($mysqli->error);
         }
-//        dd($query, $mysqli->error);
     }
-    public function createDatabase($dbName){
+
+    public function createDatabase(string $dbName=null){
+        $dbName = $dbName ?? $this->connection->getDbname();
         /** @var \mysqli $mysqli */
-        $mysqli =  $this->getDbConnection()->getEmptyMysqli();
+        $mysqli =  $this->getDbConnection()->getMysqli();
 //        $sql  = 'CREATE DATABASE  IF NOT EXISTS'.$dbName;
         $sql  = 'CREATE DATABASE  '.$dbName;
         $query = $mysqli->query($sql);
         if (!$query){
             throw new \Exception($mysqli->error);
         }
-//        dd($query, $mysqli->error);
+        return ['status' => 'success', 'msg' => $dbName.' created successfully.'];
+    }
+    public function dropDatabase(string $dbName=null){
+        $dbName = $dbName ?? $this->connection->getDbname();
+        /** @var \mysqli $mysqli */
+        $mysqli =  $this->getDbConnection()->getMysqli();
+        if ($mysqli->connect_errno) {
+            $msg =  "Failed to connect to MySQL: " . $mysqli -> connect_error;
+            throw new \Exception($msg);
+        }
+//        $sql  = 'CREATE DATABASE  IF NOT EXISTS '.$dbName;
+        $sql  = 'DROP DATABASE IF EXISTS '.$dbName;
+        $query = $mysqli->query($sql);
+        if (!$query){
+            throw new \Exception($mysqli->error);
+        }
+        return ['status' => 'success', 'msg' => $dbName.' droped successfully.'];
     }
 
 
@@ -100,5 +127,13 @@ class Database
         }
 
         return $sql;
+    }
+
+    private function checkDbConnection(\mysqli $mysqli)
+    {
+        if ($mysqli->connect_errno) {
+            $msg =  "Failed to connect to MySQL: " . $mysqli -> connect_error;
+            throw new \Exception($msg);
+        }
     }
 }

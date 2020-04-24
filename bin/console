@@ -8,13 +8,12 @@ use app\Core\Container;
 
 class Console
 {
-    const  COMMANDS =[
+    private  $commands =[
         "make:controller",
         "make:eintity",
         "make:database",
         "mvc:database:create",
     ];
-
     const FONT_COLORES = [
             "Black"     =>	"0;30",
             "Dark Grey" =>	"1;30",
@@ -71,25 +70,39 @@ class Console
     public function __construct(Container $container)
     {
         $this->container = $container;
+        $this->commands = $container->getConsoleComands();
     }
 
 
     public function handleInput($argc, $argv){
 
-      $this->colorize('handling input command from cmd', 'info');
         if ($argc === 1){
             $this->logInfo();
         }else{
             // command name
-            $command = $argv[1];
-            if (!in_array($command, self::COMMANDS)){
-              $this->logInfo();
-              return;
-            }
+            $commandName = $argv[1];
+            $alreadyConfirmd = in_array('--force', $argv);
             // check if command name registerd in app
-            $this->colorize('checking if command is registerd.', 'info');
-            // run the command
-            $this->colorize('command is running', 'info');
+            if (!isset($this->commands[$commandName])){
+              $this->logInfo();
+              return 0;
+            }
+            $command = $this->commands[$commandName];
+            if ($command->needConformation()){
+                if (!$alreadyConfirmd){
+                  $this->colorize('please enter the command with --force to confirm.', 'info');
+                  $this->colorize($commandName.' --force ', 'warning');
+                  return 0;
+                }
+            }
+            try{
+              $reslt = $command->run();
+              if ($reslt){
+                $this->colorize($reslt['msg'], $reslt['status']);
+              }
+            }catch (Exception $e){
+              $this->colorize($e->getMessage(), 'error');
+            }
         }
 
     }
@@ -134,13 +147,13 @@ class Console
     private function logInfo(){
 
         $this->colorize('Did you mean: ', 'error');
-        foreach (self::COMMANDS as $command){
+        foreach ($this->commands as $command){
             $this->colorize($command, 'info');
         }
     }
 
 }
-//include_once './app/Core/Container.php';
+
 $console = new Console($container);
 $console->handleInput($argc, $argv);
 

@@ -8,14 +8,6 @@ class Dump
 {
 
     public function dd(array $args){
-        $trace = debug_backtrace(2, true);
-        echo '<div style="background-color: #262525; color: green; padding: 10px; font-size: larger">'
-            .$trace[0]["file"]
-            .':'
-            .$trace[0]["line"]
-            .'</div>'
-        ;
-
 //    var_dump($args);die();
         foreach ($args as  $arg){
             echo '<pre style="background-color: #262525; color: #9e7713; padding: 10px; font-size: larger">';

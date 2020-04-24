@@ -16,10 +16,22 @@ spl_autoload_register(function ($className){
     }
 });
 
+
 function dd(){
+    $trace = debug_backtrace(2, true);
+    echo '<div style="background-color: #262525; color: green; padding: 10px; font-size: larger">'
+        .$trace[0]["file"]
+        .':'
+        .$trace[0]["line"]
+        .'</div>'
+    ;
     $args = func_get_args();
-    $dump = new Dump();
-    $dump->dd($args);
+
+    echo '<pre>';
+        var_dump($args); die();
+    echo '</pre>';
+//    $dump = new Dump();
+//    $dump->dd($args);
 }
 
 try{

@@ -13,6 +13,7 @@ class Container
     private $reflections = [];
     private $routes = [];
     private $route = [];
+    private $consoleComands = [];
     private $notFoundException;
     /**
      * @var DbConnection
@@ -217,24 +218,36 @@ class Container
         return $this->route;
     }
 
-    private function updateServicesReflictions()
+    private function updateServicesReflictions($mainDir = APP)
     {
-        $mainDir = SERVICES;
-        $dirs = [];
+//        dd(APP);
+//        $mainDir = APP;
+//        $mainDir = SERVICES;
         foreach (new \DirectoryIterator($mainDir) as $fileInfo) {
             if ($fileInfo->isDot()) continue;
             if ($fileInfo->isDir()) {
-                $dirs[$fileInfo->getFilename()] = $fileInfo->getPath();
+                if ($fileInfo->getPathname() === APP.'Controller') continue;
+                if ($fileInfo->getPathname() === APP.'Core') continue;
+//                dd($fileInfo->getFilename(), $fileInfo->getPathname(), $fileInfo->getPath(), APP);
+                $this->updateServicesReflictions($fileInfo->getPathname());
                 continue;
             }
-            $className = (explode('.', $fileInfo->getFilename()))[0];
-            $serviceClass = SERVICES_NAME_SPACE . $className;
-            // is the service created
-            if (array_key_exists($serviceClass, $this->reflections)) {
-                continue;
+//            $arr = explode('app', $fileInfo->getPathname());
+//            $serviceClass = 'app'.(explode('.', $arr[1]))[0];
+//            dd($fileInfo->getPathname(),$fileInfo->getExtension());
+            if ($fileInfo->isFile() && $fileInfo->getExtension() === 'php'){
+                $controllerName = (explode('app',$fileInfo->getPathname()))[1];
+                $controllerName = 'app'.$controllerName;
+                $controllerClass = (explode('.',$controllerName));
+                $className = $controllerClass[0];
+    //            dd($className);
+                // is the service created
+                if (array_key_exists($className, $this->reflections)) {
+                    continue;
+                }
+                $reflector = new \ReflectionClass($className);
+                $this->reflections[$reflector->getName()] = $reflector;
             }
-            $reflector = new \ReflectionClass($serviceClass);
-            $this->reflections[$reflector->getName()] = $reflector;
         }
     }
 
@@ -248,6 +261,9 @@ class Container
             }
             // The service instace is not in services => create instance from reflection
             $service = $this->getInstanceFromReflection($ref);
+            if ($ref->implementsInterface(ConsoleCommandInterface::class)){
+                $this->consoleComands[$service->getName()] = $service;
+            }
         }
     }
 
@@ -331,6 +347,22 @@ class Container
         $arguments = $servicesYamlArray[$serviceName]['arguments'];
 
         return  $arguments;
+    }
+
+    /**
+     * @return array
+     */
+    public function getConsoleComands()
+    {
+        return $this->consoleComands;
+    }
+
+    /**
+     * @return array
+     */
+    public function getServices()
+    {
+        return $this->services;
     }
 
 
