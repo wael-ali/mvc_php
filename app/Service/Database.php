@@ -5,17 +5,19 @@ namespace app\Service;
 
 
 use app\Core\NotFoundException;
+use app\Entity\User;
 
 class Database
 {
     use DBTrait;
-    const CREATE_TABLE = "CREATE_TABLE";
-    const CHANGE_TABLE = "CHANGE_TABLE";
-    const DROP_TABLE = "DROP_TABLE";
-    const ALTER_TABLE = "ALTER_TABLE";
+    const CREATE_TABLE  = "CREATE_TABLE";
+    const CHANGE_TABLE  = "CHANGE_TABLE";
+    const DROP_TABLE    = "DROP_TABLE";
+    const ALTER_TABLE   = "ALTER_TABLE";
+    const SELECT_ALL   = "SELECT_ALL";
 
-    const CREATE_DB = "CREATE_DB";
-    const DROP_DB = "DROP_DB";
+    const CREATE_DB     = "CREATE_DB";
+    const DROP_DB       = "DROP_DB";
 
     /**
      * @var DbConnection
@@ -34,6 +36,23 @@ class Database
 
     public function getDbConnection(){
         return $this->connection;
+    }
+    public function findAll(string $entityClass){
+        $tableName = $this->getTableNameFromEntityClass($entityClass);
+        $mysqli = $this->connection->getMysqli();
+        $mysqli->select_db($this->connection->getDbname());
+        $this->checkDbConnection($mysqli);
+        $sql = 'SELECT * FROM '.$tableName;
+
+        $query = $mysqli->query($sql);
+        $result = [];
+        foreach ($query->fetch_all(MYSQLI_ASSOC) as $rowData){
+            $row = new User();
+            $row->fillObjFromArray($rowData);
+            $result[] = $row;
+        }
+//        dd( $query->fetch_all(MYSQLI_ASSOC), $result);
+        return $result;
     }
     public function getDBtables(){
         /** @var \mysqli $mysqli */
@@ -135,5 +154,27 @@ class Database
             $msg =  "Failed to connect to MySQL: " . $mysqli -> connect_error;
             throw new \Exception($msg);
         }
+    }
+
+    private function getTableNameFromEntityClass(string $entityClass)
+    {
+        $temp = explode('\\', $entityClass);
+        $subject = $temp[count($temp) - 1];
+        $tableName = preg_replace_callback(
+            "/([A-Z]+)/",
+            function ($match) use ($subject){
+                if ($subject[0] === $match[0]){
+                    return strtolower($match[0]);
+                }
+                return '_'.strtolower($match[0]);
+            }
+            ,$subject
+        );
+        return $tableName;
+    }
+
+    private function replaceCapital($letter)
+    {
+        dd($letter);
     }
 }
