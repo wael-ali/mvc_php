@@ -58,6 +58,5 @@ class Application
             $this->currentRout = $this->container->getRoute();// default route is the notfound route
             $this->controller = $this->container->getController($this->currentRout->getController());
         }
-        dd(count($this->container->getConsoleComands()),$this->container->getConsoleComands());
     }
 }

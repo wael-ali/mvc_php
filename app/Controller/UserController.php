@@ -5,6 +5,7 @@ namespace app\Controller;
 
 
 use app\Core\Controller;
+use app\Entity\User;
 use app\Service\Database;
 
 class UserController extends Controller
@@ -13,42 +14,27 @@ class UserController extends Controller
     /**
      * @var Database
      */
-    private $db;
+    private $database;
 
-    public function __construct(Database $db)
+    public function __construct(Database $database)
     {
-        $this->db = $db;
+        parent::__construct();
+        $this->database = $database;
     }
 
-    /**
-     * @Rout(rout:"/users/update",name:"update_user")
-     */
-    public function update()
-    {
-        echo __METHOD__.'<br>';
-
-    }
     /**
      * @Rout(rout:"/users",name:"users")
      */
     public function index()
     {
-//        dd('some thing ....');
-        $this->db->createTable([
-            't_name' => 'test',
-//            't_columns' => [
-//                [
-//                    'name' => 'id',
-//                    'type' => 'int',
-//                    'length' => 11,
-//                    'isNull' => false,
-//                    'default' => 'none',
-//                    'auto_increment' => true,
-//                ],
-//            ]
+
+        $users = $this->database->findAll(User::class);
+//        dd($users);
+//        echo __METHOD__.'<br>';
+        $this->render('user/index.phtml', [
+            'controller' => __CLASS__,
+            'users' => $users
         ]);
-        $this->db->createDatabase('db_name_for_aaaa');
-        echo __METHOD__.'<br>';
 
     }
 
@@ -59,6 +45,17 @@ class UserController extends Controller
     {
         echo __METHOD__.'<br>';
     }
+
+
+    /**
+     * @Rout(rout:"/users/update",name:"update_user")
+     */
+    public function update()
+    {
+        echo __METHOD__.'<br>';
+
+    }
+
     public function __toString()
     {
         return 'home controller';
