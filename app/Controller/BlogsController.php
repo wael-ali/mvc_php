@@ -14,15 +14,10 @@ class BlogsController extends Controller implements AppInterface
      * @var MailingService
      */
     private $mailingService;
-//    /**
-//     * @var AppInterface
-//     */
-//    private $appInterface;
 
     public function __construct(MailingService $mailingService)
     {
         $this->mailingService = $mailingService;
-//        $this->appInterface = $appInterface;
     }
 
     /**
@@ -45,13 +40,13 @@ class BlogsController extends Controller implements AppInterface
     /**
      * @Rout(rout:"/blogs/create",name:"create-blog")
      */
-    public function newUser()
+    public function newBlog()
     {
         echo __METHOD__.'<br>';
     }
     public function __toString()
     {
-        return 'home controller';
+        return 'BlogsController';
     }
 
     public function getControllerName()

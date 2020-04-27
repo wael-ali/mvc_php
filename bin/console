@@ -8,12 +8,7 @@ use app\Core\Container;
 
 class Console
 {
-    private  $commands =[
-        "make:controller",
-        "make:eintity",
-        "make:database",
-        "mvc:database:create",
-    ];
+    private  $commands =[];
     const FONT_COLORES = [
             "Black"     =>	"0;30",
             "Dark Grey" =>	"1;30",
@@ -46,20 +41,20 @@ class Console
 
     const TYPES = [
         'info' => [
-            'font_color' => self::FONT_COLORES['Light Blue'],
-            'bg_color' => self::BG_COLORES['Black'],
+            'font_color'  => self::FONT_COLORES['Light Blue'],
+            'bg_color'    => self::BG_COLORES['Black'],
         ],
         'error' => [
-            'font_color' => self::FONT_COLORES['White'],
-            'bg_color' => self::BG_COLORES['Red'],
+            'font_color'  => self::FONT_COLORES['White'],
+            'bg_color'    => self::BG_COLORES['Red'],
         ],
         'success' => [
-            'font_color' => self::FONT_COLORES['Yellow'],
-            'bg_color' => self::BG_COLORES['Cyan'],
+            'font_color'  => self::FONT_COLORES['Yellow'],
+            'bg_color'    => self::BG_COLORES['Cyan'],
         ],
         'warning' => [
-            'font_color' => self::FONT_COLORES['Yellow'],
-            'bg_color' => self::BG_COLORES['Black'],
+            'font_color'  => self::FONT_COLORES['Yellow'],
+            'bg_color'    => self::BG_COLORES['Black'],
         ],
     ];
     /**
@@ -96,12 +91,23 @@ class Console
                 }
             }
             try{
-              $reslt = $command->run();
+              $reslt = $command->run($this->container);
               if ($reslt){
                 $this->colorize($reslt['msg'], $reslt['status']);
+                if (isset($reslt['output'])){
+                  if (isset($reslt['output_type'])){
+                    if ($reslt['output_type'] === 'table'){
+                      $this->printTable($reslt['output']);
+                    }else{
+                      $this->colorize($reslt['output'], 'info');
+                    }
+                  }
+                }
+                return;
               }
             }catch (Exception $e){
               $this->colorize($e->getMessage(), 'error');
+              return;
             }
         }
 
@@ -121,24 +127,36 @@ class Console
 
         switch ($type){
             case 'info':
-              echo $esc.$brackt.self::TYPES['info']['font_color'].$semi.self::TYPES['info']['bg_color'].$m
+              echo $esc.$brackt
+                  .self::TYPES['info']['font_color']
+                  .$semi.self::TYPES['info']['bg_color'].$m
                   .$text
-                  .$esc.$closeColoring.$newline;
+                  .$esc.$closeColoring.$newline
+              ;
               break;
             case 'error':
-              echo $esc.$brackt.self::TYPES['error']['font_color'].$semi.self::TYPES['error']['bg_color'].$m
+              echo $esc.$brackt
+                  .self::TYPES['error']['font_color']
+                  .$semi.self::TYPES['error']['bg_color'].$m
                   .$text
-                  .$esc.$closeColoring.$newline;
+                  .$esc.$closeColoring.$newline
+              ;
               break;
             case 'success':
-              echo $esc.$brackt.self::TYPES['success']['font_color'].$semi.self::TYPES['success']['bg_color'].$m
+              echo $esc.$brackt
+                  .self::TYPES['success']['font_color']
+                  .$semi.self::TYPES['success']['bg_color'].$m
                   .$text
-                  .$esc.$closeColoring.$newline;
+                  .$esc.$closeColoring.$newline
+              ;
               break;
             case 'warning':
-              echo $esc.$brackt.self::TYPES['warning']['font_color'].$semi.self::TYPES['warning']['bg_color'].$m
+              echo $esc.$brackt
+                  .self::TYPES['warning']['font_color']
+                  .$semi.self::TYPES['warning']['bg_color'].$m
                   .$text
-                  .$esc.$closeColoring.$newline;
+                  .$esc.$closeColoring.$newline
+              ;
               break;
 
         }
@@ -148,8 +166,48 @@ class Console
 
         $this->colorize('Did you mean: ', 'error');
         foreach ($this->commands as $command){
-            $this->colorize($command, 'info');
+            $this->colorize($command->getName(), 'info');
         }
+    }
+
+    private function printTable(array $table){
+
+      if (isset($table['headers'])){
+        $headers = explode(',', $table['headers']);
+
+        $arr = [];
+        $space = '  ';
+        $t_header = '';
+        foreach ($headers as $header){
+            $t_header .= $header
+                  .$this->getSpaces($table['chars'][$header]-strlen($header))
+                  .$space
+            ;
+        }
+
+//        var_dump($t_header); die();
+        $arr[] = $t_header;
+        for ($i = 0; $i < count($table[$headers[0]]); $i++){
+          $row = '';
+          foreach ($headers as $header){
+              $row .= $table[$header][$i]
+              .$this->getSpaces($table['chars'][$header]-strlen($table[$header][$i]))
+              .$space;
+          }
+          $arr[] = $row;
+        }
+        foreach ($arr as $item){
+          $this->colorize($item, 'info');
+        }
+      }
+    }
+
+    private function getSpaces(int $num){
+      $space = '';
+      for ($i = 0; $i <= $num; $i++){
+        $space .= ' ';
+      }
+      return $space;
     }
 
 }

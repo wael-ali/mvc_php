@@ -19,6 +19,6 @@ interface ConsoleCommandInterface
      * @param array $args
      */
     public function setArgs(array $args);
-    public function run();
+    public function run(Container $container = null): array ;
     public function needConformation(): bool;
 }

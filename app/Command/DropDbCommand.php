@@ -5,6 +5,7 @@ namespace app\Command;
 
 
 use app\Core\ConsoleCommandInterface;
+use app\Core\Container;
 use app\Service\Database;
 
 class DropDbCommand implements ConsoleCommandInterface
@@ -20,7 +21,7 @@ class DropDbCommand implements ConsoleCommandInterface
         $this->database = $database;
     }
 
-    public function run()
+    public function run(Container $container = null): array
     {
         return $this->database->dropDatabase();
     }
