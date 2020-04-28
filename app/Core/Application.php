@@ -3,6 +3,8 @@
 namespace app\Core;
 
 
+use Exception;
+
 class Application
 {
     protected $controller   = 'HomeController';
@@ -31,9 +33,20 @@ class Application
             echo '<pre>';
             echo $e->getMessage();
             echo '</pre>';
-        }catch (\Exception $e){
-            echo $e->getMessage();
+        }catch (Exception $e){
+            if (!isset($GLOBALS['APP_ENV'])){
+                echo '<h1> Sorrey, Something went wrong</h1>';
+                return;
+            }
+            if (($GLOBALS['APP_ENV'] != 'PROD')){
+                throw $e;
+            }
+
+            echo '<h1> Sorrey, Something went wrong</h1>';
         }
+
+
+
     }
 
     protected function loadController(){

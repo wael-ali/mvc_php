@@ -133,9 +133,14 @@ class User
              }
          }
     }
-    public function __toString()
+
+    public function getName()
     {
         return $this->firstname.' '.$this->lastname;
+    }
+    public function __toString()
+    {
+        return $this->getName();
     }
 
 }
