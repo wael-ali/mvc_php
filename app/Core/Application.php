@@ -39,12 +39,14 @@ class Application
     protected function loadController(){
 
         $requestUri = $_SERVER['REQUEST_URI'];
+        // get route object from the container depending on url
         foreach ($this->container->getRoutes() as $route){
             if ($requestUri == $route->getRout()){
                 $this->currentRout  = $route;
                 break;
             }
         }
+        // Route is found. load the controller.
         if ($this->currentRout){
             try{
                 $this->controller = $this->container->getController($this->currentRout->getController());
@@ -54,6 +56,7 @@ class Application
             }catch (\Exception $e){
                 echo $e->getMessage();
             }
+        // NO matching route is found. load the not found Route and controller.
         }else{
             $this->currentRout = $this->container->getRoute();// default route is the notfound route
             $this->controller = $this->container->getController($this->currentRout->getController());

@@ -31,9 +31,9 @@ class UserController extends Controller
         $users = $this->database->findAll(User::class);
 //        dd($users);
 //        echo __METHOD__.'<br>';
-        $this->render('user/index.phtml', [
-            'controller' => __CLASS__,
-            'users' => $users
+        $this->render('user/index.tpl.html', [
+            'userObj' => $users[0],
+            'user' => $users[0],
         ]);
 
     }

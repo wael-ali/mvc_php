@@ -27,6 +27,8 @@ class Error extends Controller
     }
     private function notFoundDEV()
     {
-        $this->render('errors/undefinedRoute.phtml');
+        $this->render('errors/undefinedRoute.phtml', [
+            'msg' => 'change me at: View/errors/undefinedRoute.phtml',
+        ]);
     }
 }

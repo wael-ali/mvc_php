@@ -31,13 +31,46 @@ class View
         }finally{
             if (!$ok){
                 $this->templateData['error'] = $errorMsg;
-                include VIEW.$this->templateName;
+//                include VIEW.$this->templateName;
+                $this->show();
 
             }else{
                 $this->templateName = $templateName;
                 $this->templateData = $templateData;
-                include VIEW.$this->templateName;
+//                include VIEW.$this->templateName;
+                $this->show();
             }
         }
+    }
+
+    private function show()
+    {
+        $templateContent = file_get_contents(VIEW.$this->templateName);
+//        dd($templateContent, $this->templateData);
+        foreach ($this->templateData as $key => $value){
+            if (is_string($value)){
+                $templateContent = preg_replace_callback(
+                    '/{{'.$key.'}}|{{\s+'.$key.'\s+}}/',
+                    function ($item) use ($value){
+                        return $value;
+                    },
+                    $templateContent
+                    )
+                ;
+            }
+
+            if (is_object($value)){
+                $templateContent = preg_replace_callback(
+                    '/{{'.$key.'}}|{{\s+'.$key.'\s+}}/',
+                    function ($item) use ($value){
+//                        $r = (string)$value;
+                        return (string)$value;
+                    },
+                    $templateContent
+                )
+                ;
+            }
+        }
+        echo $templateContent;
     }
 }
