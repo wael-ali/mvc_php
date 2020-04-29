@@ -10,10 +10,18 @@
 <body>
 <h4>user/index.tpl.html</h4>
 
-<h6>{{user.id}}</h6>
-<h6>{{ user.firstname }}</h6>
-<h6>{{ user.name }}</h6>
-
+<h6>The variable is stirng: </h6>
+<!--<span><i>{{name}}</i></span>-->
+<h6>The variable is an  object with __toStrig function: </h6>
+<!--<span><i>{{user}}</i></span>-->
+<h6>Looping on string array: </h6>
+<div style="background-color: black">
+  {% for color in cols %} <span style="color:{{ color }}">{{ color }}</span><br>{% endfor %}
+</div>
+  {% for item in items %} <b>{{item}}</b><br> {% endfor %}
+<h6> Looping on objects array: </h6>
+<!--<div>{% for user in users %} <div style="">{{ user.firstname }} &#45;&#45;  {{ user.lastname }} </div> {% endfor %}</div>-->
+{% for user in users %}<div style="color: darkcyan; width=100%; padding: 20px; border: 2px dashed lightsteelblue; margin-bottom: 10px">{{user.name}}<br>{{user.email}}</div>{% endfor %}
 
 
 </body>

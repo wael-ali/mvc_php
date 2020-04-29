@@ -31,8 +31,12 @@ class UserController extends Controller
         $users = $this->database->findAll(User::class);
 
         $this->render('user/index.tpl.html', [
-            'colors' => ['green', 'blue', 'yellow', 'grey'],
-            'user' => $users[0],
+            'cols' => ['green', 'blue', 'yellow', 'grey', 'red'],
+            'items' => ['car', 'house', 'school', 'factory', 'street'],
+//            'cols' => [22, 33, 44, 55, 66, 77],
+            'users' =>  $users,
+            'name' =>  'Wael ali',
+            'user' => $users[0]
         ]);
 
     }
