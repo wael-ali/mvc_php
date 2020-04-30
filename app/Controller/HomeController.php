@@ -15,7 +15,7 @@ class HomeController extends Controller
      */
     public function index()
     {
-
+//        $this->redirectTo('create-user'); return;
         $this->render('home/index.tpl.html',[
             'controller' => __CLASS__,
             'colors' => ['green', 'blue', 'grey', 'red']

@@ -9,6 +9,7 @@ class Application
 {
     protected $controller   = 'HomeController';
     protected $currentRout;
+    protected $tempRoutName;
     /**
      * @var Container
      */
@@ -53,6 +54,29 @@ class Application
     protected function loadController(){
 
         $requestUri = $_SERVER['REQUEST_URI'];
+
+        $isRouteName = preg_replace_callback(
+            '/^(\/@@_route_name\?)([a-z-_]+)?/',
+            function ($item) {
+                if ($item[1] === '/@@_route_name?'){
+                    $this->tempRoutName = $item[2];
+                    return true;
+                }
+                $this->tempRoutName = null;
+                return false;
+            },
+            $requestUri
+        );
+
+        if ($isRouteName){
+            // get route object from the container depending on route name in url and redirect to it.
+            foreach ($this->container->getRoutes() as $route){
+                if ($this->tempRoutName == $route->getName()){
+                    header('location: '.$route->getRout());
+                    break;
+                }
+            }
+        }
         // get route object from the container depending on url
         foreach ($this->container->getRoutes() as $route){
             if ($requestUri == $route->getRout()){
@@ -60,6 +84,7 @@ class Application
                 break;
             }
         }
+
         // Route is found. load the controller.
         if ($this->currentRout){
             try{

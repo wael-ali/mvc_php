@@ -32,8 +32,9 @@ abstract class Controller
             header('location: '.$http.$url);
         }
     }
-    public function redirectTo($route)
+    public function redirectTo($routeName)
     {
+        $route = '@@_route_name?'.$routeName;
        header('location: '.$route);
     }
 }
