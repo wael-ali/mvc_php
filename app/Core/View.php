@@ -13,7 +13,7 @@ class View
 
     public function __construct()
     {
-        $this->templateName = 'errors/somethingWentWrong.phtml';
+        $this->templateName = 'errors/somethingWentWrong.tpl.html';
     }
 
 
@@ -32,7 +32,11 @@ class View
             $ok = false;
         }finally{
             if (!$ok){
-                $this->templateData['error'] = $errorMsg;
+                $this->templateData['error'] = $GLOBALS['APP_ENV'] !== 'PROD' ?
+                    $errorMsg
+                    :
+                    '500 error'
+                ;
                 $this->show();
 
             }else{

@@ -41,8 +41,9 @@ class Application
             if (($GLOBALS['APP_ENV'] != 'PROD')){
                 throw $e;
             }
-
-            echo '<h1> Sorrey, Something went wrong</h1>';
+            echo '<div style="padding: 100px"><h3>
+              500 Error: Sorrey, Something went wrong
+            </h3></div>';
         }
 
 

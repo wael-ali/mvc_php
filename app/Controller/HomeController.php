@@ -16,7 +16,7 @@ class HomeController extends Controller
     public function index()
     {
 
-        $this->render('home/index.phtml',[
+        $this->render('home/index.tpl.html',[
             'controller' => __CLASS__,
             'colors' => ['green', 'blue', 'grey', 'red']
         ]);
@@ -28,7 +28,7 @@ class HomeController extends Controller
      */
     public function aboutUs()
     {
-        $this->render('home/about.phtml');
+        $this->render('home/about.tpl.html');
     }
     public function __toString()
     {

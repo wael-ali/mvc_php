@@ -5,11 +5,14 @@
   <meta name="viewport"
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Something wen wrong</title>
+  <title>index.phtml</title>
 </head>
 <body>
-<h1>Something went wrong!! .........</h1>
+<h5>{{controller}}</h5>
+<div>
+{% for color in colors %}<h4 style="color: {{color}}" >{{ color }}</h4>{% endfor %}
+</div>
 
-<h5><?php echo $this->templateData['error'] ;?></h5>
+
 </body>
 </html>

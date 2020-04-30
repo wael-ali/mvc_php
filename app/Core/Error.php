@@ -23,12 +23,14 @@ class Error extends Controller
 
     private function notFoundProd()
     {
-        echo '<h1>404 Not Found!!</h1>';
+        $this->render('errors/undefinedRoute.tpl.html', [
+            'msg' => '404 Not found...',
+        ]);
     }
     private function notFoundDEV()
     {
-        $this->render('errors/undefinedRoute.phtml', [
-            'msg' => 'change me at: View/errors/undefinedRoute.phtml',
+        $this->render('errors/undefinedRoute.tpl.html', [
+            'msg' => 'This route is not defined, change this template @: View/errors/undefinedRoute.tpl.html',
         ]);
     }
 }
